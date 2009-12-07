@@ -1,0 +1,639 @@
+<!--
+  Standard JGroups protocol stacks definitions, used by the JChannelFactory bean.
+  Author: Bela Ban, Brian Stansberry
+  Version: $Id: mock-channelfactory-stacks.xml 5376 2008-11-17 23:02:35Z clebert.suconic@jboss.com $
+-->
+<protocol_stacks>
+    <stack name="jbm-control"
+           description="Stack optimized for the JBoss Messaging Control Channel">
+       <config>
+	        <UDP
+	             singleton_name="shared-udp"
+	             mcast_port="${jboss.jgroups.udp.mcast_port:45688}"
+	             mcast_addr="${jgroups.udp.mcast_addr:228.11.11.11}"
+	             tos="8"
+	             ucast_recv_buf_size="20000000"
+	             ucast_send_buf_size="640000"
+	             mcast_recv_buf_size="25000000"
+	             mcast_send_buf_size="640000"
+	             loopback="true"
+	             discard_incompatible_packets="true"
+	             enable_bundling="false"
+	             max_bundle_size="64000"
+	             max_bundle_timeout="30"
+	             use_incoming_packet_handler="true"
+	             ip_ttl="${jgroups.udp.ip_ttl:2}"
+	             thread_naming_pattern="cl"
+	             timer.num_threads="12"
+	                         
+	             use_concurrent_stack="true"
+	        
+	             thread_pool.enabled="true"
+	             thread_pool.min_threads="20"
+	             thread_pool.max_threads="200"
+	             thread_pool.keep_alive_time="5000"
+	             thread_pool.queue_enabled="true"
+	             thread_pool.queue_max_size="1000"
+	             thread_pool.rejection_policy="discard"
+	              
+	             oob_thread_pool.enabled="true"
+	             oob_thread_pool.min_threads="1"
+	             oob_thread_pool.max_threads="20"
+	             oob_thread_pool.keep_alive_time="5000"
+	             oob_thread_pool.queue_enabled="false"
+	             oob_thread_pool.queue_max_size="100"
+	             oob_thread_pool.rejection_policy="run"/>
+            <PING timeout="2000"
+                  num_initial_members="3"/>
+            <MERGE2 max_interval="100000"
+                    min_interval="20000"/>
+            <FD_SOCK />
+            <FD timeout="6000" max_tries="5" shun="true"/>
+            <VERIFY_SUSPECT timeout="1500" />
+            <BARRIER />
+            <pbcast.NAKACK use_stats_for_retransmission="false"
+                   exponential_backoff="150"
+                   use_mcast_xmit="true" gc_lag="0"
+                   retransmit_timeout="50,300,600,1200"
+                   discard_delivered_msgs="true"/>
+            <UNICAST timeout="300,600,1200,2400,3600"/>
+            <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+                           max_bytes="400000"/>
+            <VIEW_SYNC avg_send_interval="10000"/>
+            <pbcast.GMS print_local_addr="true" join_timeout="3000"
+                shun="true"
+                view_bundling="true"/>
+            <FC max_credits="500000"
+                    min_threshold="0.20"/>
+            <FRAG2 frag_size="60000"  />
+            <pbcast.STATE_TRANSFER/>
+            <pbcast.FLUSH timeout="20000"/>
+        </config>
+    </stack>
+    
+    <stack name="jbm-data"
+           description="Stack optimized for the JBoss Messaging Data Channel">
+        <config>
+            <TCP singleton_name="jbm-data"
+                 start_port="7900"
+                 loopback="true"
+                 recv_buf_size="20000000"
+                 send_buf_size="640000"
+                 discard_incompatible_packets="true"
+                 max_bundle_size="64000"
+                 max_bundle_timeout="30"
+                 use_incoming_packet_handler="true"
+                 enable_bundling="false"
+                 use_send_queues="false"
+                 sock_conn_timeout="300"
+                 skip_suspected_members="true"
+                 
+                 use_concurrent_stack="true" 
+                 
+                 thread_pool.enabled="true"
+                 thread_pool.min_threads="8"
+                 thread_pool.max_threads="200"
+                 thread_pool.keep_alive_time="5000"
+                 thread_pool.queue_enabled="true" 
+                 thread_pool.queue_max_size="500"
+                 thread_pool.rejection_policy="discard"
+                 
+                 oob_thread_pool.enabled="true"
+                 oob_thread_pool.min_threads="1"
+                 oob_thread_pool.max_threads="100" 
+                 oob_thread_pool.keep_alive_time="5000"
+                 oob_thread_pool.queue_enabled="false"
+                 oob_thread_pool.queue_max_size="100"
+                 oob_thread_pool.rejection_policy="run"/>
+            <MPING timeout="5000"
+               mcast_addr="${jboss.messaging.datachanneludpaddress,jboss.partition.udpGroup:228.6.6.6}"
+               mcast_port="${jboss.messaging.datachanneludpport:45567}"
+               ip_ttl="${jboss.messaging.ipttl:8}"
+               num_initial_members="5"
+               num_ping_requests="3"/>
+            <MERGE2 max_interval="100000" min_interval="20000"/>
+            <FD_SOCK/>
+            <FD timeout="6000" max_tries="5" shun="true"/>
+            <VERIFY_SUSPECT timeout="1500"/>
+            <BARRIER/>
+            <pbcast.NAKACK use_mcast_xmit="false" gc_lag="0"
+                           retransmit_timeout="300,600,1200,2400,4800"
+                           discard_delivered_msgs="true"/>
+            <UNICAST timeout="300,600,1200,2400,3600"/>
+            <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+                           max_bytes="400000"/>
+            <VIEW_SYNC avg_send_interval="10000"/>
+
+            <pbcast.GMS print_local_addr="true" join_timeout="3000"
+                shun="true" view_bundling="true"/>
+        </config>
+    </stack>
+           
+    <!-- ClusteredPostOfficeTest needs to run multiple JGroups instances inside the same VM, and we need multiple stacks for that --> 
+    
+    
+    <stack name="jbm-control_1"
+           description="Stack optimized for the JBoss Messaging Control Channel">
+       <config>
+	        <UDP
+	             singleton_name="shared-udp_1"
+	             mcast_port="${jboss.jgroups.udp.mcast_port:45688}"
+	             mcast_addr="${jgroups.udp.mcast_addr:228.11.11.11}"
+	             tos="8"
+	             ucast_recv_buf_size="20000000"
+	             ucast_send_buf_size="640000"
+	             mcast_recv_buf_size="25000000"
+	             mcast_send_buf_size="640000"
+	             loopback="true"
+	             discard_incompatible_packets="true"
+	             enable_bundling="false"
+	             max_bundle_size="64000"
+	             max_bundle_timeout="30"
+	             use_incoming_packet_handler="true"
+	             ip_ttl="${jgroups.udp.ip_ttl:2}"
+	             thread_naming_pattern="cl"
+	             timer.num_threads="12"
+	                         
+	             use_concurrent_stack="true"
+	        
+	             thread_pool.enabled="true"
+	             thread_pool.min_threads="20"
+	             thread_pool.max_threads="200"
+	             thread_pool.keep_alive_time="5000"
+	             thread_pool.queue_enabled="true"
+	             thread_pool.queue_max_size="1000"
+	             thread_pool.rejection_policy="discard"
+	              
+	             oob_thread_pool.enabled="true"
+	             oob_thread_pool.min_threads="1"
+	             oob_thread_pool.max_threads="20"
+	             oob_thread_pool.keep_alive_time="5000"
+	             oob_thread_pool.queue_enabled="false"
+	             oob_thread_pool.queue_max_size="100"
+	             oob_thread_pool.rejection_policy="run"/>
+            <PING timeout="2000"
+                  num_initial_members="3"/>
+            <MERGE2 max_interval="100000"
+                    min_interval="20000"/>
+            <FD_SOCK />
+            <FD timeout="6000" max_tries="5" shun="true"/>
+            <VERIFY_SUSPECT timeout="1500" />
+            <BARRIER />
+            <pbcast.NAKACK use_stats_for_retransmission="false"
+                   exponential_backoff="150"
+                   use_mcast_xmit="true" gc_lag="0"
+                   retransmit_timeout="50,300,600,1200"
+                   discard_delivered_msgs="true"/>
+            <UNICAST timeout="300,600,1200,2400,3600"/>
+            <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+                           max_bytes="400000"/>
+            <VIEW_SYNC avg_send_interval="10000"/>
+            <pbcast.GMS print_local_addr="true" join_timeout="3000"
+                shun="true"
+                view_bundling="true"/>
+            <FC max_credits="500000"
+                    min_threshold="0.20"/>
+            <FRAG2 frag_size="60000"  />
+            <pbcast.STATE_TRANSFER/>
+            <pbcast.FLUSH timeout="20000"/>
+        </config>
+    </stack>
+    
+    <stack name="jbm-data_1"
+           description="Stack optimized for the JBoss Messaging Data Channel">
+        <config>
+            <TCP singleton_name="jbm-data_1"
+                 start_port="7900"
+                 loopback="true"
+                 recv_buf_size="20000000"
+                 send_buf_size="640000"
+                 discard_incompatible_packets="true"
+                 max_bundle_size="64000"
+                 max_bundle_timeout="30"
+                 use_incoming_packet_handler="true"
+                 enable_bundling="false"
+                 use_send_queues="false"
+                 sock_conn_timeout="300"
+                 skip_suspected_members="true"
+                 
+                 use_concurrent_stack="true" 
+                 
+                 thread_pool.enabled="true"
+                 thread_pool.min_threads="8"
+                 thread_pool.max_threads="200"
+                 thread_pool.keep_alive_time="5000"
+                 thread_pool.queue_enabled="true" 
+                 thread_pool.queue_max_size="500"
+                 thread_pool.rejection_policy="discard"
+                 
+                 oob_thread_pool.enabled="true"
+                 oob_thread_pool.min_threads="1"
+                 oob_thread_pool.max_threads="100" 
+                 oob_thread_pool.keep_alive_time="5000"
+                 oob_thread_pool.queue_enabled="false"
+                 oob_thread_pool.queue_max_size="100"
+                 oob_thread_pool.rejection_policy="run"/>
+            <MPING timeout="5000"
+               mcast_addr="${jboss.messaging.datachanneludpaddress,jboss.partition.udpGroup:228.6.6.6}"
+               mcast_port="${jboss.messaging.datachanneludpport:45567}"
+               ip_ttl="${jboss.messaging.ipttl:8}"
+               num_initial_members="5"
+               num_ping_requests="3"/>
+            <MERGE2 max_interval="100000" min_interval="20000"/>
+            <FD_SOCK/>
+            <FD timeout="6000" max_tries="5" shun="true"/>
+            <VERIFY_SUSPECT timeout="1500"/>
+            <BARRIER/>
+            <pbcast.NAKACK use_mcast_xmit="false" gc_lag="0"
+                           retransmit_timeout="300,600,1200,2400,4800"
+                           discard_delivered_msgs="true"/>
+            <UNICAST timeout="300,600,1200,2400,3600"/>
+            <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+                           max_bytes="400000"/>
+            <VIEW_SYNC avg_send_interval="10000"/>
+
+            <pbcast.GMS print_local_addr="true" join_timeout="3000"
+                shun="true" view_bundling="true"/>
+        </config>
+    </stack>
+
+    <stack name="jbm-control_2"
+           description="Stack optimized for the JBoss Messaging Control Channel">
+       <config>
+	        <UDP
+	             singleton_name="shared-udp_2"
+	             mcast_port="${jboss.jgroups.udp.mcast_port:45688}"
+	             mcast_addr="${jgroups.udp.mcast_addr:228.11.11.11}"
+	             tos="8"
+	             ucast_recv_buf_size="20000000"
+	             ucast_send_buf_size="640000"
+	             mcast_recv_buf_size="25000000"
+	             mcast_send_buf_size="640000"
+	             loopback="true"
+	             discard_incompatible_packets="true"
+	             enable_bundling="false"
+	             max_bundle_size="64000"
+	             max_bundle_timeout="30"
+	             use_incoming_packet_handler="true"
+	             ip_ttl="${jgroups.udp.ip_ttl:2}"
+	             thread_naming_pattern="cl"
+	             timer.num_threads="12"
+	                         
+	             use_concurrent_stack="true"
+	        
+	             thread_pool.enabled="true"
+	             thread_pool.min_threads="20"
+	             thread_pool.max_threads="200"
+	             thread_pool.keep_alive_time="5000"
+	             thread_pool.queue_enabled="true"
+	             thread_pool.queue_max_size="1000"
+	             thread_pool.rejection_policy="discard"
+	              
+	             oob_thread_pool.enabled="true"
+	             oob_thread_pool.min_threads="1"
+	             oob_thread_pool.max_threads="20"
+	             oob_thread_pool.keep_alive_time="5000"
+	             oob_thread_pool.queue_enabled="false"
+	             oob_thread_pool.queue_max_size="100"
+	             oob_thread_pool.rejection_policy="run"/>
+            <PING timeout="2000"
+                  num_initial_members="3"/>
+            <MERGE2 max_interval="100000"
+                    min_interval="20000"/>
+            <FD_SOCK />
+            <FD timeout="6000" max_tries="5" shun="true"/>
+            <VERIFY_SUSPECT timeout="1500" />
+            <BARRIER />
+            <pbcast.NAKACK use_stats_for_retransmission="false"
+                   exponential_backoff="150"
+                   use_mcast_xmit="true" gc_lag="0"
+                   retransmit_timeout="50,300,600,1200"
+                   discard_delivered_msgs="true"/>
+            <UNICAST timeout="300,600,1200,2400,3600"/>
+            <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+                           max_bytes="400000"/>
+            <VIEW_SYNC avg_send_interval="10000"/>
+            <pbcast.GMS print_local_addr="true" join_timeout="3000"
+                shun="true"
+                view_bundling="true"/>
+            <FC max_credits="500000"
+                    min_threshold="0.20"/>
+            <FRAG2 frag_size="60000"  />
+            <pbcast.STATE_TRANSFER/>
+            <pbcast.FLUSH timeout="20000"/>
+        </config>
+    </stack>
+    
+    <stack name="jbm-data_2"
+           description="Stack optimized for the JBoss Messaging Data Channel">
+        <config>
+            <TCP singleton_name="jbm-data_2"
+                 start_port="7900"
+                 loopback="true"
+                 recv_buf_size="20000000"
+                 send_buf_size="640000"
+                 discard_incompatible_packets="true"
+                 max_bundle_size="64000"
+                 max_bundle_timeout="30"
+                 use_incoming_packet_handler="true"
+                 enable_bundling="false"
+                 use_send_queues="false"
+                 sock_conn_timeout="300"
+                 skip_suspected_members="true"
+                 
+                 use_concurrent_stack="true" 
+                 
+                 thread_pool.enabled="true"
+                 thread_pool.min_threads="8"
+                 thread_pool.max_threads="200"
+                 thread_pool.keep_alive_time="5000"
+                 thread_pool.queue_enabled="true" 
+                 thread_pool.queue_max_size="500"
+                 thread_pool.rejection_policy="discard"
+                 
+                 oob_thread_pool.enabled="true"
+                 oob_thread_pool.min_threads="1"
+                 oob_thread_pool.max_threads="100" 
+                 oob_thread_pool.keep_alive_time="5000"
+                 oob_thread_pool.queue_enabled="false"
+                 oob_thread_pool.queue_max_size="100"
+                 oob_thread_pool.rejection_policy="run"/>
+            <MPING timeout="5000"
+               mcast_addr="${jboss.messaging.datachanneludpaddress,jboss.partition.udpGroup:228.6.6.6}"
+               mcast_port="${jboss.messaging.datachanneludpport:45567}"
+               ip_ttl="${jboss.messaging.ipttl:8}"
+               num_initial_members="5"
+               num_ping_requests="3"/>
+            <MERGE2 max_interval="100000" min_interval="20000"/>
+            <FD_SOCK/>
+            <FD timeout="6000" max_tries="5" shun="true"/>
+            <VERIFY_SUSPECT timeout="1500"/>
+            <BARRIER/>
+            <pbcast.NAKACK use_mcast_xmit="false" gc_lag="0"
+                           retransmit_timeout="300,600,1200,2400,4800"
+                           discard_delivered_msgs="true"/>
+            <UNICAST timeout="300,600,1200,2400,3600"/>
+            <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+                           max_bytes="400000"/>
+            <VIEW_SYNC avg_send_interval="10000"/>
+
+            <pbcast.GMS print_local_addr="true" join_timeout="3000"
+                shun="true" view_bundling="true"/>
+        </config>
+    </stack>
+           
+    <stack name="jbm-control_3"
+           description="Stack optimized for the JBoss Messaging Control Channel">
+       <config>
+	        <UDP
+	             singleton_name="shared-udp_3"
+	             mcast_port="${jboss.jgroups.udp.mcast_port:45688}"
+	             mcast_addr="${jgroups.udp.mcast_addr:228.11.11.11}"
+	             tos="8"
+	             ucast_recv_buf_size="20000000"
+	             ucast_send_buf_size="640000"
+	             mcast_recv_buf_size="25000000"
+	             mcast_send_buf_size="640000"
+	             loopback="true"
+	             discard_incompatible_packets="true"
+	             enable_bundling="false"
+	             max_bundle_size="64000"
+	             max_bundle_timeout="30"
+	             use_incoming_packet_handler="true"
+	             ip_ttl="${jgroups.udp.ip_ttl:2}"
+	             thread_naming_pattern="cl"
+	             timer.num_threads="12"
+	                         
+	             use_concurrent_stack="true"
+	        
+	             thread_pool.enabled="true"
+	             thread_pool.min_threads="20"
+	             thread_pool.max_threads="200"
+	             thread_pool.keep_alive_time="5000"
+	             thread_pool.queue_enabled="true"
+	             thread_pool.queue_max_size="1000"
+	             thread_pool.rejection_policy="discard"
+	              
+	             oob_thread_pool.enabled="true"
+	             oob_thread_pool.min_threads="1"
+	             oob_thread_pool.max_threads="20"
+	             oob_thread_pool.keep_alive_time="5000"
+	             oob_thread_pool.queue_enabled="false"
+	             oob_thread_pool.queue_max_size="100"
+	             oob_thread_pool.rejection_policy="run"/>
+            <PING timeout="2000"
+                  num_initial_members="3"/>
+            <MERGE2 max_interval="100000"
+                    min_interval="20000"/>
+            <FD_SOCK />
+            <FD timeout="6000" max_tries="5" shun="true"/>
+            <VERIFY_SUSPECT timeout="1500" />
+            <BARRIER />
+            <pbcast.NAKACK use_stats_for_retransmission="false"
+                   exponential_backoff="150"
+                   use_mcast_xmit="true" gc_lag="0"
+                   retransmit_timeout="50,300,600,1200"
+                   discard_delivered_msgs="true"/>
+            <UNICAST timeout="300,600,1200,2400,3600"/>
+            <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+                           max_bytes="400000"/>
+            <VIEW_SYNC avg_send_interval="10000"/>
+            <pbcast.GMS print_local_addr="true" join_timeout="3000"
+                shun="true"
+                view_bundling="true"/>
+            <FC max_credits="500000"
+                    min_threshold="0.20"/>
+            <FRAG2 frag_size="60000"  />
+            <pbcast.STATE_TRANSFER/>
+            <pbcast.FLUSH timeout="20000"/>
+        </config>
+    </stack>
+    
+    <stack name="jbm-data_3"
+           description="Stack optimized for the JBoss Messaging Data Channel">
+        <config>
+            <TCP singleton_name="jbm-data_3"
+                 start_port="7900"
+                 loopback="true"
+                 recv_buf_size="20000000"
+                 send_buf_size="640000"
+                 discard_incompatible_packets="true"
+                 max_bundle_size="64000"
+                 max_bundle_timeout="30"
+                 use_incoming_packet_handler="true"
+                 enable_bundling="false"
+                 use_send_queues="false"
+                 sock_conn_timeout="300"
+                 skip_suspected_members="true"
+                 
+                 use_concurrent_stack="true" 
+                 
+                 thread_pool.enabled="true"
+                 thread_pool.min_threads="8"
+                 thread_pool.max_threads="200"
+                 thread_pool.keep_alive_time="5000"
+                 thread_pool.queue_enabled="true" 
+                 thread_pool.queue_max_size="500"
+                 thread_pool.rejection_policy="discard"
+                 
+                 oob_thread_pool.enabled="true"
+                 oob_thread_pool.min_threads="1"
+                 oob_thread_pool.max_threads="100" 
+                 oob_thread_pool.keep_alive_time="5000"
+                 oob_thread_pool.queue_enabled="false"
+                 oob_thread_pool.queue_max_size="100"
+                 oob_thread_pool.rejection_policy="run"/>
+            <MPING timeout="5000"
+               mcast_addr="${jboss.messaging.datachanneludpaddress,jboss.partition.udpGroup:228.6.6.6}"
+               mcast_port="${jboss.messaging.datachanneludpport:45567}"
+               ip_ttl="${jboss.messaging.ipttl:8}"
+               num_initial_members="5"
+               num_ping_requests="3"/>
+            <MERGE2 max_interval="100000" min_interval="20000"/>
+            <FD_SOCK/>
+            <FD timeout="6000" max_tries="5" shun="true"/>
+            <VERIFY_SUSPECT timeout="1500"/>
+            <BARRIER/>
+            <pbcast.NAKACK use_mcast_xmit="false" gc_lag="0"
+                           retransmit_timeout="300,600,1200,2400,4800"
+                           discard_delivered_msgs="true"/>
+            <UNICAST timeout="300,600,1200,2400,3600"/>
+            <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+                           max_bytes="400000"/>
+            <VIEW_SYNC avg_send_interval="10000"/>
+
+            <pbcast.GMS print_local_addr="true" join_timeout="3000"
+                shun="true" view_bundling="true"/>
+        </config>
+    </stack>
+           
+           
+    <stack name="jbm-control_4"
+           description="Stack optimized for the JBoss Messaging Control Channel">
+       <config>
+	        <UDP
+	             singleton_name="shared-udp_4"
+	             mcast_port="${jboss.jgroups.udp.mcast_port:45688}"
+	             mcast_addr="${jgroups.udp.mcast_addr:228.11.11.11}"
+	             tos="8"
+	             ucast_recv_buf_size="20000000"
+	             ucast_send_buf_size="640000"
+	             mcast_recv_buf_size="25000000"
+	             mcast_send_buf_size="640000"
+	             loopback="true"
+	             discard_incompatible_packets="true"
+	             enable_bundling="false"
+	             max_bundle_size="64000"
+	             max_bundle_timeout="30"
+	             use_incoming_packet_handler="true"
+	             ip_ttl="${jgroups.udp.ip_ttl:2}"
+	             thread_naming_pattern="cl"
+	             timer.num_threads="12"
+	                         
+	             use_concurrent_stack="true"
+	        
+	             thread_pool.enabled="true"
+	             thread_pool.min_threads="20"
+	             thread_pool.max_threads="200"
+	             thread_pool.keep_alive_time="5000"
+	             thread_pool.queue_enabled="true"
+	             thread_pool.queue_max_size="1000"
+	             thread_pool.rejection_policy="discard"
+	              
+	             oob_thread_pool.enabled="true"
+	             oob_thread_pool.min_threads="1"
+	             oob_thread_pool.max_threads="20"
+	             oob_thread_pool.keep_alive_time="5000"
+	             oob_thread_pool.queue_enabled="false"
+	             oob_thread_pool.queue_max_size="100"
+	             oob_thread_pool.rejection_policy="run"/>
+            <PING timeout="2000"
+                  num_initial_members="3"/>
+            <MERGE2 max_interval="100000"
+                    min_interval="20000"/>
+            <FD_SOCK />
+            <FD timeout="6000" max_tries="5" shun="true"/>
+            <VERIFY_SUSPECT timeout="1500" />
+            <BARRIER />
+            <pbcast.NAKACK use_stats_for_retransmission="false"
+                   exponential_backoff="150"
+                   use_mcast_xmit="true" gc_lag="0"
+                   retransmit_timeout="50,300,600,1200"
+                   discard_delivered_msgs="true"/>
+            <UNICAST timeout="300,600,1200,2400,3600"/>
+            <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+                           max_bytes="400000"/>
+            <VIEW_SYNC avg_send_interval="10000"/>
+            <pbcast.GMS print_local_addr="true" join_timeout="3000"
+                shun="true"
+                view_bundling="true"/>
+            <FC max_credits="500000"
+                    min_threshold="0.20"/>
+            <FRAG2 frag_size="60000"  />
+            <pbcast.STATE_TRANSFER/>
+            <pbcast.FLUSH timeout="20000"/>
+        </config>
+    </stack>
+    
+    <stack name="jbm-data_4"
+           description="Stack optimized for the JBoss Messaging Data Channel">
+        <config>
+            <TCP singleton_name="jbm-data_4"
+                 start_port="7900"
+                 loopback="true"
+                 recv_buf_size="20000000"
+                 send_buf_size="640000"
+                 discard_incompatible_packets="true"
+                 max_bundle_size="64000"
+                 max_bundle_timeout="30"
+                 use_incoming_packet_handler="true"
+                 enable_bundling="false"
+                 use_send_queues="false"
+                 sock_conn_timeout="300"
+                 skip_suspected_members="true"
+                 
+                 use_concurrent_stack="true" 
+                 
+                 thread_pool.enabled="true"
+                 thread_pool.min_threads="8"
+                 thread_pool.max_threads="200"
+                 thread_pool.keep_alive_time="5000"
+                 thread_pool.queue_enabled="true" 
+                 thread_pool.queue_max_size="500"
+                 thread_pool.rejection_policy="discard"
+                 
+                 oob_thread_pool.enabled="true"
+                 oob_thread_pool.min_threads="1"
+                 oob_thread_pool.max_threads="100" 
+                 oob_thread_pool.keep_alive_time="5000"
+                 oob_thread_pool.queue_enabled="false"
+                 oob_thread_pool.queue_max_size="100"
+                 oob_thread_pool.rejection_policy="run"/>
+            <MPING timeout="5000"
+               mcast_addr="${jboss.messaging.datachanneludpaddress,jboss.partition.udpGroup:228.6.6.6}"
+               mcast_port="${jboss.messaging.datachanneludpport:45567}"
+               ip_ttl="${jboss.messaging.ipttl:8}"
+               num_initial_members="5"
+               num_ping_requests="3"/>
+            <MERGE2 max_interval="100000" min_interval="20000"/>
+            <FD_SOCK/>
+            <FD timeout="6000" max_tries="5" shun="true"/>
+            <VERIFY_SUSPECT timeout="1500"/>
+            <BARRIER/>
+            <pbcast.NAKACK use_mcast_xmit="false" gc_lag="0"
+                           retransmit_timeout="300,600,1200,2400,4800"
+                           discard_delivered_msgs="true"/>
+            <UNICAST timeout="300,600,1200,2400,3600"/>
+            <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+                           max_bytes="400000"/>
+            <VIEW_SYNC avg_send_interval="10000"/>
+
+            <pbcast.GMS print_local_addr="true" join_timeout="3000"
+                shun="true" view_bundling="true"/>
+        </config>
+    </stack>
+           
+           
+</protocol_stacks>
+
+

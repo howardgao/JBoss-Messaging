@@ -1,0 +1,102 @@
+<project name="JBoss Messaging AS5 Include">
+   <!--
+         Non-JBoss dependencies.
+         They must available in the repository and declared as <componentrefs> in build-thirdparty.xml.
+    -->
+    <path id="external.dependencies.classpath" >
+       <path refid="apache.logging.classpath" />
+       <path refid="oswego.concurrent.classpath"/>
+       <path refid="javassist.classpath"/>
+       <path refid="jgroups.jgroups.classpath"/>
+       <path refid="trove.trove.classpath"/>
+       <path refid="apache.logging.classpath"/>
+    </path>
+
+    <!--
+         JBoss dependencies.
+         They must available in the repository and declared as <componentrefs> in build-thirdparty.xml.
+
+         NOTE: If one of JBoss dependencies (jboss-remoting.jar) is locally
+               present in ./lib, it will take precedence over the corresponding repository instance.
+     -->
+   	
+    <path id="jboss.dependencies.classpath">
+       <path refid="jboss.common.core.classpath"/>
+       <path refid="jboss.common.logging.jdk.classpath"/>
+       <path refid="jboss.common.logging.log4j.classpath"/>
+       <path refid="jboss.common.logging.spi.classpath"/>
+    	  <path refid="jboss.jboss.mdr.classpath"/>
+       <path refid="jboss.aop.classpath"/>
+       <path refid="jboss.remoting.classpath"/>
+       <path refid="jboss.jbossts.classpath"/>
+       <path refid="jbossas.core.libs.classpath"/>
+       <!-- some components at JBoss use JBossSerialization (JCA for instance) -->
+       <path refid="jboss.serialization.classpath"/>
+    </path>
+
+    <!--
+         The compilation classpath.
+    -->
+    <path id="compilation.classpath">
+       <path refid="external.dependencies.classpath"/>
+       <path refid="jboss.dependencies.classpath"/>
+    </path>
+
+    <!--
+         The AOPC classpath.
+    -->
+    <path id="aopc.classpath">
+       <path refid="compilation.classpath"/>
+       <pathelement path="${build.classes}"/>
+    </path>
+
+	
+  <target name="instrument-classes">
+      <taskdef name="aopc" classname="org.jboss.aop.ant.AopC" classpathref="jboss.aop.classpath"/>
+      <echo message="NOTE: aopc incremental compilation might fail, if so do an ant clean first (see JBMESSAGING-271)"/>
+      <aopc compilerclasspathref="aopc.classpath"
+            classpathref="aopc.classpath"
+            verbose="false">
+            <sysproperty key="jboss.aop.instrumentor" value="org.jboss.aop.instrument.ClassicInstrumentor"/>
+         <classpath refid="aopc.classpath"/>
+         <src path="${build.classes}/org/jboss/jms"/>
+         <aoppath path="${source.etc}/prepare-aop.xml"/>
+      </aopc>
+   </target>
+
+   <!-- Note: This target must be ran after the smoke test -->
+   <target name="examples" depends="release-structure">
+      <copy todir="${release.output}/examples">
+         <fileset dir="./docs/examples" excludes="examples.properties">
+            <exclude name="programmatic-deployment"/>
+	    <exclude name="stateless-clustered/**"/>
+	    <exclude name="**/*/build.xml*"/>
+         </fileset>
+      </copy>
+      <copy todir="${release.output}/examples">
+         <fileset dir="./docs/examples">
+	    <exclude name="stateless-clustered/**"/>
+         </fileset>
+	 <globmapper from="*build.xml.AS5" to="*build.xml"/>
+      </copy>
+      <copy todir="${release.output}/examples/config">
+         <fileset dir="${integration-dir}/etc/server/default/deploy">
+            <include name="*-persistence-service.xml"/>
+            <include name="*-ds.xml"/>
+         </fileset>
+         <fileset dir="${integration-dir}/etc/remoting">
+            <include name="servlet-invoker.war/**/*"/>
+            <include name="*-service.xml"/>
+         </fileset>
+      </copy>
+   </target>
+
+   <target name="extra" depends="examples" description="create an example package for AS5">
+      <mkdir dir="${build.lib}"/>
+      <zip destfile="${build.lib}/jbm-examples-${messaging.version.major}.${messaging.version.minor}.${messaging.version.revision}.zip">
+         <zipfileset dir="${release.output}/examples" prefix="extra/jbm-examples"/>
+      </zip>
+   </target>
+
+
+</project>

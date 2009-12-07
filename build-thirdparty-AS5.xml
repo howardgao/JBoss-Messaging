@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- =========================================================================================== -->
+<!--                                                                                             -->
+<!-- JBoss, Home of Professional Open Source                                                     -->
+<!-- Copyright 2005, JBoss Inc., and individual contributors as indicated                        -->
+<!-- by the @authors tag. See the copyright.txt in the distribution for a                        -->
+<!-- full listing of individual contributors.                                                    -->
+<!--                                                                                             -->
+<!-- This is free software; you can redistribute it and/or modify it                             -->
+<!-- under the terms of the GNU Lesser General Public License as                                 -->
+<!-- published by the Free Software Foundation; either version 2.1 of                            -->
+<!-- the License, or (at your option) any later version.                                         -->
+<!--                                                                                             -->
+<!-- This software is distributed in the hope that it will be useful,                            -->
+<!-- but WITHOUT ANY WARRANTY; without even the implied warranty of                              -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU                            -->
+<!-- Lesser General Public License for more details.                                             -->
+<!--                                                                                             -->
+<!-- You should have received a copy of the GNU Lesser General Public                            -->
+<!-- License along with this software; if not, write to the Free                                 -->
+<!-- Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA                          -->
+<!-- 02110-1301 USA, or see the FSF site: http://www.fsf.org.                                    -->
+<!--                                                                                             -->
+<!-- =========================================================================================== -->
+
+
+<!-- =========================================================================================== -->
+<!--                                                                                             -->
+<!-- $Id$ -->
+<!--                                                                                             -->
+<!-- =========================================================================================== -->
+
+<project name="main.build" default="synchronize">
+
+   <!-- ======================================================================================== -->
+   <!-- Configuration                                                                            -->
+   <!-- ======================================================================================== -->
+
+   <property file="local.properties"/>
+   <property file="synchronize.properties"/>
+   <property name="librariesEntFile" value="./thirdparty/libraries.ent"/>
+
+   <property environment="ENV"/>
+
+   <!--
+      | Allow jbossbuild.repository to be set from (in order or priority)
+      | 1) Command line -Djbossbuild.repository=...
+      | 2) synchronize.properties jbossbuild.repository setting
+      | 3) JBOSS_REPOSITORY environment variable
+   -->
+   <condition property="jbossbuild.repository" value="${ENV.JBOSS_REPOSITORY}">
+      <isset property="ENV.JBOSS_REPOSITORY"/>
+   </condition>
+
+   <!--
+      | Fall back to default.
+   -->
+   <property name="jbossbuild.repository" value="http://repository.jboss.com"/>
+
+   <import file="./tools/etc/jbossbuild/tasks.xml"/>
+
+   <!--
+      | This is where JBoss Messaging external dependencies are declared. The repository is in CVS
+      | under the module repository.jboss.com whose contents are pushed to the
+      | http://repository.jboss.com site.
+   -->
+   <build id="jboss-messaging"
+          impltitle="JBoss Messaging"
+          implversion="undefined"
+          implvendor="JBoss Inc."
+          implurl="http://www.jboss.org"
+          description="JBoss Messaging"
+          cvsroot="${cvs.prefix}@cvs.forge.jboss.com:/cvsroot/jboss"
+          thirdpartypath="./thirdparty/"
+          location="${jbossbuild.repository}"
+          targetdefs="targets">
+
+
+      <!--
+           Dependencies required to build the project.
+      -->
+      <componentref name="retrotranslator" version="0.9.6jboss"/>
+      <componentref name="sun-javacc" version="4.0"/>
+      <componentref name="oswego-concurrent" version="1.3.4-jboss-update1"/>
+      <componentref name="apache-log4j" version="1.2.14"/>
+      <componentref name="javassist" version="3.9.0.GA"/>
+      <componentref name="jgroups" version="2.6.13.GA-brew"/>
+      <componentref name="trove" version="1.0.2"/>
+      <componentref name="jboss/common-core" version="2.2.14.GA"/>
+      <componentref name="jboss/common-logging-jdk" version="2.1.0.GA"/>
+      <componentref name="jboss/common-logging-log4j" version="2.1.0.GA"/>
+      <componentref name="jboss/common-logging-spi" version="2.1.0.GA"/>
+      <componentref name="jboss/jboss-mdr" version="2.0.1.GA"/>
+      <componentref name="jboss/aop" version="2.1.4.GA-brew"/>
+      <componentref name="jboss/remoting" version="2.5.2-brew"/>
+      <componentref name="jboss/jbossts" version="4.6.1.GA_CP03-brew"/>
+      <componentref name="jbossas/core-libs" version="4.2.0.GA"/>
+   	
+      
+  	  <!-- <componentref name="jboss/microcontainer" version="2.0.0.Beta5"/>
+      <componentref name="jboss/jboss-security-spi" version="2.0.1.GA"/>
+      <componentref name="jboss/jboss-jaspi-api" version="1.0-BETA1"/>
+      <componentref name="jboss/integration" version="5.0.0.Beta4"/>
+      <componentref name="org/jboss/jbosssx-client" version="2.0.1.GA"/>
+      <componentref name="org/jboss/jboss-javaee" version="5.0.0.Beta3Update1"/>
+      <componentref name="org/jboss/jboss-common-logging-spi" version="2.0.4.GA"/> -->
+   	
+
+
+      <!--
+          Totally unapropriate here, but this is what we need to do for the time being if we
+          want HTTP.
+          See http://www.jboss.com/index.html?module=bb&op=viewtopic&p=4022727 for more details.
+      -->
+      <componentref name="apache-tomcat" version="5.5.15"/>
+
+      <!--
+           Dependencies required to test the project.
+      -->
+      <componentref name="junit" version="3.8.2-brew"/>
+      <componentref name="hsqldb" version="1.8.0.8-brew"/>
+      <componentref name="dom4j" version="1.6.1"/>
+      <componentref name="apache-xerces" version="2.9.1"/> <!-- needed by org.jboss.logging.Log4jLoggerPlugin -->
+      <componentref name="jboss/profiler/jvmti" version="1.0.0.CR5"/>
+      <componentref name="jboss/jbossxb" version="2.0.0.GA"/>
+      <componentref name="jboss/test14" version="1.0.0.GA"/>
+
+      <!-- This is a non declared dependency of jboss/test14 -->
+      <componentref name="jboss/jbossretro-rt" version="1.0.5.GA"/>
+      <!-- This is a non declared dependency of jboss/test14 -->
+      <componentref name="jboss/backport-concurrent" version="2.1.0.GA"/>
+
+
+   </build>
+
+   <synchronizeinfo/>
+
+   <!--
+      | Generate the targets.
+   -->
+   <generate generate="jboss-messaging"/>
+
+   <target name="generate-libraries-ent" depends="synchronize">
+      <gen-lib-file path="tools/etc/buildmagic" filename="${librariesEntFile}"/>
+      <visit-componentref-graph componentVisitor="org.jboss.ant.util.graph.ComponentRefGraphLicenseVisitor"/>
+   </target>
+
+</project>

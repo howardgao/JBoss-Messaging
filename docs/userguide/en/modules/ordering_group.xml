@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="ordering-group">
+  <title>Enabling JBoss Messaging Ordering Group</title>
+
+  <para>This section describes how to use JBoss Messaging ordering group feature to achieve strict message ordering.
+  </para>
+
+  <para>JBoss Messaging's implementation of strict message ordering is called message ordering groups. Messages in one orddering group obey strict delivering order, 
+  which means that messages in an ordering group will be delivered exactly in the order of their arrival at the target queue (FIFO). 
+  Ordering groups are identified by their string names.</para>
+
+  <para>When ordering group is enabled, message priorities will not take any effect on the ordering of the messages. Message ordering groups obey the following rules:</para>
+
+  <para>Rule 1. Messages in the ordering group are delivered one at a time. Next message will not be delivered until the delivery of previous message is completed.</para>
+
+  <itemizedlist>
+    <listitem>For CLIENT_ACKNOWLEDGE mode, the Message.acknowledge() method signals the completion state.</listitem>
+    <listitem>For AUTO_ACKNOWLEDGE and DUPS_OK_ACKNOWLEDGE modes, the completion of the message is identified by either
+
+      <para>1) successful returning from the MessageConsumer.receive() methods, or</para>
+      <para>2) successful returning from the onMessage() call of the MessageListener();</para>
+    </listitem>
+  </itemizedlist>
+    
+    
+  <para>If the message consumer is closed, the current message processing is deemed to be finished, even if the acknowledge is not called before consumer close.</para>
+
+  <para>Rule 2. In case of transactional receiving, the next message will not be delivered until the transaction that includes the receiving of the previous message has been committed. If the transaction is rolled back, the previous message will be cancelled back to the JMS server and thus available for the next delivery. 
+</para>
+
+<section id="enable.ordering.group">
+  <title>How to Enable Message Ordering Group</title>
+
+<para>There are two ways to use message ordering group: through programming and through configuration.</para>
+
+  <itemizedlist>
+<listitem>The Programming Way</listitem>
+  </itemizedlist>
+  
+<para>To make use of JBoss Messaging's ordering group feature, one has to obtain a JBossMessageProducer.</para>
+
+  <programlisting>
+     JBossMessageProducer producer = (JBossMessageProducer)session.createProducer(queue);
+  </programlisting>
+
+<para>JBossMessageProducer has two methods for starting/ending an ordering group.</para>
+  
+  <programlisting>
+public void enableOrderingGroup(String ogrpName) throws JMSException
+  </programlisting>
+
+<para>Creating a ordering group with name ogrpName. Once called, the producer will send messages on behave of the ordering group. If null parameter is given, the name of the ordering group will be automatically generated. Calling this method more than once will always override the previous calls.</para>
+
+  <programlisting>
+public void disableOrderingGroup() throws JMSException
+  </programlisting>
+  
+<para>Stop producing ordering group messages. Once called, the producer will stop sending out ordering group messages and return to its normal behavior.</para>
+
+  <itemizedlist>
+<listitem>The Configuration Way</listitem>
+  </itemizedlist>
+
+<para>Users can configure a JBoss Messaging connection factory to enable ordering group. Two new attributes are added to the factory service configuration file.</para>
+
+  <programlisting>
+EnableOrderingGroup -- set this property to true to enable the ordering group. Default is false; and
+DefaultOrderingGroupName -- the default name for the message ordering group. If absent, the group 
+                            name will be generated automatically.
+  </programlisting>
+
+<para>Once configured to enable ordering group on a connection factory, all messages that are sent from any producers created from this connection factory become ordering group messages.</para>
+
+<para>Example:</para>
+
+  <programlisting>
+   &lt;mbean code=&quot;org.jboss.jms.server.connectionfactory.ConnectionFactory&quot;
+      name=&quot;jboss.messaging.connectionfactory:service=ConnectionFactory&quot;
+      xmbean-dd=&quot;xmdesc/ConnectionFactory-xmbean.xml&quot;&gt;
+      &lt;depends optional-attribute-name=&quot;ServerPeer&quot;&gt;jboss.messaging:service=ServerPeer&lt;/depends&gt;
+      &lt;depends optional-attribute-name=&quot;Connector&quot;&gt;jboss.messaging:service=Connector,transport=bisocket&lt;/depends&gt;
+      &lt;depends&gt;jboss.messaging:service=PostOffice&lt;/depends&gt;
+
+      &lt;attribute name=&quot;JNDIBindings&quot;&gt;
+         &lt;bindings&gt;
+            &lt;binding&gt;/MyConnectionFactory&lt;/binding&gt;
+            &lt;binding&gt;/XAConnectionFactory&lt;/binding&gt;
+            &lt;binding&gt;java:/MyConnectionFactory&lt;/binding&gt;
+            &lt;binding&gt;java:/XAConnectionFactory&lt;/binding&gt;
+         &lt;/bindings&gt;
+      &lt;/attribute&gt;
+      
+      &lt;!-- This are the two properties --&gt;
+      &lt;attribute name=&quot;EnableOrderingGroup&quot;&gt;true&lt;/attribute&gt;
+      &lt;attribute name=&quot;DefaultOrderingGroupName&quot;&gt;MyOrderingGroup&lt;/attribute&gt;
+   &lt;/mbean&gt;
+  </programlisting>
+
+<para>The good thing about this way is the user doesn't need to make any coding effort to get message ordering functionality.</para>
+
+</section>
+
+<section id="note.ordering.group">
+  <title>Notes and Limitations</title>
+
+  <itemizedlist>
+
+<listitem>Ordering group doesn't work with topics. Users requiring order groups have to user queues.</listitem>
+<listitem>Ordering group shouldn't be used together with message selectors and scheduled delivery.</listitem>
+<listitem>If a message is 'dead' (goes to DLQ) or expired (goes to ExpiryQueue), this message is considered completed and next message will be available for delivery.</listitem>
+<listitem>When using a ConnectionConsumer, ordering of the messages will be observed. However, it doesn't control which session will be receiving the next message.</listitem>
+<listitem>In case of Distributed Queue, user should use HASingleton to make sure ordering group works properly.</listitem>
+  </itemizedlist>
+
+</section>
+
+</chapter>

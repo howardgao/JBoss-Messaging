@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- =========================================================================================== -->
+<!--                                                                                             -->
+<!-- JBoss, Home of Professional Open Source                                                     -->
+<!-- Copyright 2005, JBoss Inc., and individual contributors as indicated                        -->
+<!-- by the @authors tag. See the copyright.txt in the distribution for a                        -->
+<!-- full listing of individual contributors.                                                    -->
+<!--                                                                                             -->
+<!-- This is free software; you can redistribute it and/or modify it                             -->
+<!-- under the terms of the GNU Lesser General Public License as                                 -->
+<!-- published by the Free Software Foundation; either version 2.1 of                            -->
+<!-- the License, or (at your option) any later version.                                         -->
+<!--                                                                                             -->
+<!-- This software is distributed in the hope that it will be useful,                            -->
+<!-- but WITHOUT ANY WARRANTY; without even the implied warranty of                              -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU                            -->
+<!-- Lesser General Public License for more details.                                             -->
+<!--                                                                                             -->
+<!-- You should have received a copy of the GNU Lesser General Public                            -->
+<!-- License along with this software; if not, write to the Free                                 -->
+<!-- Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA                          -->
+<!-- 02110-1301 USA, or see the FSF site: http://www.fsf.org.                                    -->
+<!--                                                                                             -->
+<!-- =========================================================================================== -->
+
+
+<!-- =========================================================================================== -->
+<!--                                                                                             -->
+<!-- $Id: build.xml 7889 2009-11-02 05:50:00Z gaohoward $ -->
+<!--                                                                                             -->
+<!-- =========================================================================================== -->
+
+
+<project default="jar" name="JBoss Messaging">
+
+   <!--
+        Setting "external.project" to true makes jbossbuild use the current directory, and not its
+        parent, as project root. DO NOT change this.
+   -->
+   <property name="external.project" value="true"/>
+	
+   <property file="build.properties"/>
+
+   <!--
+        Create the thirdparty folder from items in the repository then generate a new libraries.ent
+        file and include it in the build.
+   -->
+   <target name="createthirdparty" unless="inhibit.downloads" depends="check.inhibit.downloads">
+      <ant antfile="build-thirdparty-${integration.base}.xml" target="generate-libraries-ent"/>
+      <echo message="Copying Eclipse .classpath from ./integration/${integration.base}/.classpath"/>
+      <copy file="./integration/${integration.base}/.classpath" tofile="./.classpath" overwrite="true"/>
+   </target>
+
+   <target name="check.inhibit.downloads">
+      <condition property="inhibit.downloads">
+         <and>
+            <uptodate property="dependencies.current"
+                      srcfile="build-thirdparty-${integration.base}.xml"
+                      targetfile="./thirdparty/libraries.ent"/>
+            <uptodate property="dependencies.current"
+                      srcfile="build.properties"
+                      targetfile="./thirdparty/libraries.ent"/>
+         </and>
+      </condition>
+   </target>
+
+   <target name="compile" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="compile"/>
+   </target>
+
+   <target name="show.version" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="show.version"/>
+   </target>
+
+   <target name="sar" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="sar"/>
+   </target>
+
+   <target name="client-jar" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="client-jar"/>
+   </target>
+
+   <target name="fat-client-jar" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="fat-client-jar"/>
+   </target>
+
+   <target name="jar" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="jar"/>
+   </target>
+
+   <target name="artifacts" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="artifacts"/>
+   </target>
+
+   <target name="archive-functional" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="archive-functional"/>
+   </target>
+
+   <target name="archive-stress" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="archive-stress"/>
+   </target>
+
+   <target name="archive-smoke" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="archive-smoke"/>
+   </target>
+
+   <target name="release-bundle" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="release-bundle"/>
+   </target>
+
+   <target name="source-bundle" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="source-bundle"/>
+   </target>
+
+   <target name="extra">
+      <ant antfile="build-messaging.xml" target="extra"/>
+   </target>
+
+   <target name="clean" depends="createthirdparty">
+      <ant antfile="build-messaging.xml" target="clean"/>
+   </target>
+
+   <target name="smoke">
+      <ant dir="tests/smoke" antfile="build.xml" target="all" inheritAll="false"/>
+   </target>
+
+</project>

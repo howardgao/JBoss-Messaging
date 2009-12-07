@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+     Servlet Transport Example.
+
+     $Id: messaging-http-service.xml 2773 2007-06-12 13:31:30Z sergeypk $
+ -->
+
+<server>
+   
+   <mbean code="org.jboss.jms.server.connectionfactory.ConnectionFactory"
+          name="jboss.messaging.destination:service=ServletConnectionFactory"
+          xmbean-dd="xmdesc/ConnectionFactory-xmbean.xml">
+      <depends optional-attribute-name="ServerPeer">jboss.messaging:service=ServerPeer</depends>
+      <depends optional-attribute-name="Connector">jboss.remoting:service=Connector,transport=servlet,target=jms</depends>
+      <depends>jboss.messaging:service=PostOffice</depends>
+      <attribute name="JNDIBindings">
+         <bindings>
+            <binding>/ServletConnectionFactory</binding>
+         </bindings>
+      </attribute>
+   </mbean>
+
+</server>

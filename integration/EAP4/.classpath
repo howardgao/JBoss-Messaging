@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="docs/examples/queue-failover/src"/>
+	<classpathentry kind="src" path="integration/EAP4/src"/>
+	<classpathentry kind="src" path="integration/EAP4/tests-src"/>
+	<classpathentry kind="src" path="docs/examples/bridge/src"/>
+	<classpathentry kind="src" path="docs/examples/stateless-clustered/src"/>
+	<classpathentry kind="src" path="docs/examples/web-service/src-client"/>
+	<classpathentry kind="src" path="docs/examples/web-service/src"/>
+	<classpathentry kind="src" path="docs/examples/mdb-failure/src"/>
+	<classpathentry kind="src" path="docs/examples/distributed-queue/src"/>
+	<classpathentry kind="src" path="output/gen-parsers"/>
+	<classpathentry kind="src" path="docs/examples/common/src"/>
+	<classpathentry kind="src" path="docs/examples/distributed-topic/src"/>
+	<classpathentry kind="src" path="docs/examples/ejb3mdb/src"/>
+	<classpathentry kind="src" path="docs/examples/http/src"/>
+	<classpathentry kind="src" path="docs/examples/mdb/src"/>
+	<classpathentry kind="src" path="docs/examples/ordering-group/src"/>
+	<classpathentry kind="src" path="docs/examples/queue/src"/>
+	<classpathentry kind="src" path="docs/examples/secure-socket/src"/>
+	<classpathentry kind="src" path="docs/examples/stateless/src"/>
+	<classpathentry kind="src" path="docs/examples/topic/src"/>
+	<classpathentry excluding="**/.svn/**/*" kind="src" path="src/main"/>
+	<classpathentry excluding="**/.svn/**/*" kind="src" path="tests/src"/>
+	<classpathentry kind="lib" path="thirdparty/oswego-concurrent/lib/concurrent.jar" sourcepath="/extra/work-clebert/concurrent/concurrent/src"/>
+	<classpathentry kind="lib" path="thirdparty/jgroups/lib/jgroups.jar"/>
+	<classpathentry kind="lib" path="thirdparty/apache-log4j/lib/log4j.jar"/>
+	<classpathentry kind="lib" path="thirdparty/junit/lib/junit.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jboss/profiler/jvmti/lib/jboss-profiler-jvmti.jar"/>
+	<classpathentry kind="lib" path="thirdparty/hsqldb/lib/hsqldb.jar"/>
+	<classpathentry kind="lib" path="thirdparty/apache-logging/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jboss/serialization/lib/jboss-serialization.jar"/>
+	<classpathentry kind="lib" path="thirdparty/sun-javacc/lib/javacc.jar"/>
+	<classpathentry kind="lib" path="thirdparty/apache-xerces/lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="thirdparty/dom4j/lib/dom4j.jar"/>
+	<classpathentry kind="lib" path="thirdparty/javassist/lib/javassist.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jboss/aop/lib/jdk14-pluggable-instrumentor.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jboss/aop/lib/jrockit-pluggable-instrumentor.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jboss/aop/lib/pluggable-instrumentor.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jboss/jbossxb/lib/jboss-xml-binding.jar"/>
+	<classpathentry kind="lib" path="thirdparty/retrotranslator/lib/backport-util-concurrent.jar"/>
+	<classpathentry kind="lib" path="thirdparty/retrotranslator/lib/retrotranslator-runtime.jar"/>
+	<classpathentry kind="lib" path="thirdparty/retrotranslator/lib/retrotranslator-transformer.jar"/>
+	<classpathentry kind="lib" path="thirdparty/trove/lib/trove.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jboss/remoting/lib/jboss-remoting.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jboss/jbossts14/lib/jbossjta.jar"/>
+	<classpathentry kind="var" path="ANT_HOME/lib/ant.jar"/>
+	<classpathentry kind="var" path="ANT_HOME/lib/ant-junit.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jboss/common/lib/jboss-common.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jboss-j2ee.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jboss/aop/lib/jboss-aop.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jboss-system.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jboss-jmx.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jboss-transaction-client.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jbosssx-client.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jboss.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jms-ra.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jboss-common.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jboss-common-jdbc-wrapper.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jbosscx-client.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jboss-jca.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jboss-local-jdbc.jar"/>
+	<classpathentry kind="lib" path="thirdparty/jbossas/core-libs/lib/jboss-xml-binding.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
